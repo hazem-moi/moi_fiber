@@ -7,16 +7,15 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: moi_fiber
     ports:
-      - '5532:5432'
+      - '5532:5432'   # was 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U splicenet -d splicenet"]
+      test: ['CMD-SHELL', 'pg_isready -U moi_fiber']
       interval: 5s
       timeout: 5s
-      retries: 20
-    
-    
+      retries: 5
+    restart: unless-stopped
 
   api:
     build:
@@ -31,6 +30,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
 
   realtime:
     build:
@@ -45,6 +45,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
 
   web:
     build:
@@ -58,6 +59,7 @@ services:
     depends_on:
       - api
       - realtime
+    restart: unless-stopped
 
 volumes:
   pgdata:

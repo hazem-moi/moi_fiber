@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY packages/shared/package.json ./packages/shared/
@@ -11,12 +11,10 @@ WORKDIR /app/packages/api
 RUN npx prisma generate
 RUN npx nest build
 
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 WORKDIR /app
 COPY --from=builder /app/packages/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-# REMOVE the next line (it breaks):
-# COPY --from=builder /app/packages/api/node_modules ./packages/api/node_modules
 COPY packages/api/prisma ./prisma
 COPY packages/api/start.sh ./start.sh
 RUN chmod +x ./start.sh
