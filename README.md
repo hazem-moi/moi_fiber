@@ -6,10 +6,29 @@ A self-hosted fiber splicing diagram web app with real-time multi-user editing.
 
 ```bash
 cp .env.example .env
-docker compose up
+docker compose up --build
 ```
 
 Then open http://localhost:5173
+
+### Default Admin Account
+
+A default admin user is created automatically on first startup:
+
+| Field    | Default value       |
+|----------|---------------------|
+| Email    | `admin@example.com` |
+| Password | `11335577`          |
+| Name     | `admin`             |
+
+> **⚠️ Warning:** These defaults are for development only. Override them via environment
+> variables before deploying to production:
+>
+> ```
+> DEFAULT_ADMIN_EMAIL=you@example.com
+> DEFAULT_ADMIN_PASSWORD=<strong-password>
+> DEFAULT_ADMIN_NAME=Administrator
+> ```
 
 ## Development
 
