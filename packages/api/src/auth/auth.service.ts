@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,7 +7,25 @@ import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
+
+  async ensureAdminUser() {
+    const email = process.env.DEFAULT_ADMIN_EMAIL ?? 'admin@example.com';
+    const password = process.env.DEFAULT_ADMIN_PASSWORD ?? '11335577';
+    const name = process.env.DEFAULT_ADMIN_NAME ?? 'admin';
+
+    const existing = await this.prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      this.logger.log('Default admin user already exists');
+      return;
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+    await this.prisma.user.create({ data: { email, passwordHash: hash, name } });
+    this.logger.log('Default admin user created');
+  }
 
   async register(dto: RegisterDto) {
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
