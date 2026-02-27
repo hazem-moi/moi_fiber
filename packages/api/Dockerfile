@@ -15,7 +15,8 @@ FROM node:20-alpine
 WORKDIR /app
 COPY --from=builder /app/packages/api/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/api/node_modules ./packages/api/node_modules
+# REMOVE the next line (it breaks):
+# COPY --from=builder /app/packages/api/node_modules ./packages/api/node_modules
 COPY packages/api/prisma ./prisma
 COPY packages/api/start.sh ./start.sh
 RUN chmod +x ./start.sh
