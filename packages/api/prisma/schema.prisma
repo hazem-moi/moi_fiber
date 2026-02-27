@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Project {
+  id           String        @id @default(uuid())
+  name         String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  pages        Page[]
+  colorSchemes ColorScheme[]
+
+  @@map("projects")
+}
+
+model Page {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  yjsDoc    YjsDoc?
+
+  @@map("pages")
+}
+
+model ColorScheme {
+  id             String   @id @default(uuid())
+  scope          String   @default("standard") // standard | custom
+  ownerProjectId String?  @map("owner_project_id")
+  name           String
+  spec           Json
+  createdAt      DateTime @default(now()) @map("created_at")
+  project        Project? @relation(fields: [ownerProjectId], references: [id], onDelete: Cascade)
+
+  @@map("color_schemes")
+}
+
+model YjsDoc {
+  docKey    String   @id @map("doc_key")
+  projectId String   @map("project_id")
+  pageId    String   @unique @map("page_id")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  state     Bytes
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@map("yjs_docs")
+}
