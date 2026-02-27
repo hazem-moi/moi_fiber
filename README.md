@@ -11,6 +11,15 @@ docker compose up --build
 
 Then open http://localhost:5173
 
+### Docker Service Ports
+
+| Service  | Host port | Notes                     |
+|----------|-----------|---------------------------|
+| Web      | 5173      | Nginx serving React SPA   |
+| API      | 3201      | NestJS REST API           |
+| Realtime | 1234      | Hocuspocus WebSocket      |
+| DB       | 5532      | PostgreSQL (internal only)|
+
 ### Default Admin Account
 
 A default admin user is created automatically on first startup:
@@ -43,9 +52,9 @@ npm install
 cp .env.example .env
 # Edit .env with your DATABASE_URL, JWT_SECRET etc.
 
-# Run DB migrations
+# Push schema to DB (creates tables without a migrations folder)
 cd packages/api
-DATABASE_URL=postgresql://moi_fiber:secret@localhost:5432/moi_fiber npx prisma migrate dev --name init
+DATABASE_URL=postgresql://moi_fiber:secret@localhost:5432/moi_fiber npx prisma db push
 cd ../..
 
 # Start all services
